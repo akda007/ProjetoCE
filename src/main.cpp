@@ -21,14 +21,14 @@ bool night_mode_state = false;
 uint64_t ciclos = 0, changes = 0;
 
 enum Color {
-  RED,
+  GREEN,
   YELLOW,
-  GREEN
+  RED
 };
 
-Color current_color = RED;
+Color current_color = GREEN;
 
-uint32_t colors[] = {RED_PIN, YELLOW_PIN, GREEN_PIN};
+uint32_t colors[] = {GREEN_PIN, YELLOW_PIN, RED_PIN};
 
 void setup() {
   Serial.begin(115200);
@@ -48,7 +48,7 @@ void turn_leds_off( ){
 }
 
 String get_color_name(Color color) {
-  return color == RED ? "Vermelha" : color == YELLOW ? "Amarela" : "Verde";
+  return color == GREEN ? "Verde" : color == YELLOW ? "Amarela" : "Vermelha";
 }
 
 void update_color() {
@@ -58,10 +58,8 @@ void update_color() {
 
   digitalWrite(colors[current_color], HIGH);
 
-  Serial.printf("Mudando para a luz %s\n", get_color_name(current_color));
+  Serial.printf("[%lu ms] Mudando para a luz %s\n", (unsigned long)millis(), get_color_name(current_color).c_str());
 }
-
-
 
 void loop() {
   int pot_input = analogRead(POT_PIN);
@@ -75,15 +73,16 @@ void loop() {
       night_mode = !night_mode;
 
       if (night_mode) {
-        Serial.println("Nightmode Ligado!");
+        Serial.printf("[%lu ms] Nightmode Ligado!\n", (unsigned long)millis());
       } else {
-        Serial.println("Nightmode Desligado!");
+        Serial.printf("[%lu ms] Nightmode Desligado!\n", (unsigned long)millis());
       }
     } else {
       if (system_paused) {
-        Serial.println("Sistema Despausado!!!");
+        Serial.printf("[%lu ms] Sistema Despausado!!!\n", (unsigned long)millis());
       } else {
-        Serial.println("Sistema Pausado!!!");
+        Serial.printf("[%lu ms] Sistema Pausado!!!\n", (unsigned long)millis());
+        turn_leds_off();
       }
 
       system_paused = !system_paused;
@@ -111,7 +110,7 @@ void loop() {
     }
 
     if (changes % 15 == 0) {
-      Serial.printf("%i ciclos completos!\n", ciclos);
+      Serial.printf("[%lu ms] %i ciclos completos!\n", (unsigned long)millis(), (int)ciclos);
     }
   }
 
@@ -122,10 +121,6 @@ void loop() {
     night_mode_state = !night_mode_state;
 
     nightmode_delay = millis();
-
-    
   }
 
-  // Serial.printf("Potenciometro: %i, delay = %i\n", pot_input, led_delay);
 }
-
